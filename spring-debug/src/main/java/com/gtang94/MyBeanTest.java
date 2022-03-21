@@ -1,4 +1,4 @@
-package com.gtang94.beans;
+package com.gtang94;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
