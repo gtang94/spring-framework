@@ -13,8 +13,8 @@ public class MyBeanTest {
 
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("MyBean.xml");
-		Object myBean = context.getBean("myBean");
-		System.err.println(myBean.toString());
+		MyBean myBean = (MyBean) context.getBean("myBean");
+		System.err.println(myBean.getTestStr());
 	}
 
 }

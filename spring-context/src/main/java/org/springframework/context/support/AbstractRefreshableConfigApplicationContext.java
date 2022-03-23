@@ -72,6 +72,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	/**
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
+	 *
+	 * 设置Spring容器的Bean的Xml文件的配置位置，如果没有设置，则使用默认配置（TODO：默认配置是什么？）
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {

@@ -918,12 +918,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
+		// 触发所有非懒加载的单例bean的初始化
 		for (String beanName : beanNames) {
+			// 将beanDefinition转化为RootBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// 不是抽象类并且是单例并且非懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 是否为工厂bean
 				if (isFactoryBean(beanName)) {
+					// 由于是以&开头获取bean,这里返回的是一个工厂bean，并且不会调用getObject方法
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
+						// 判断是否要立即初始化bean
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
@@ -936,17 +942,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
 						if (isEagerInit) {
+							// 以为&开头的方式再获取一次，此时会调用FactoryBean的getObject()方法
 							getBean(beanName);
 						}
 					}
 				}
 				else {
+					// 不是FactoryBean，直接使用getBean进行初始化
 					getBean(beanName);
 				}
 			}
 		}
 
 		// Trigger post-initialization callback for all applicable beans...
+		// 触发所有实例bean的后置增强器回调
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {
