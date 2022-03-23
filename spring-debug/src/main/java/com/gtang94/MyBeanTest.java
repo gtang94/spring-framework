@@ -1,5 +1,6 @@
 package com.gtang94;
 
+import com.gtang94.beans.MyBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

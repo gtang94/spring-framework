@@ -915,18 +915,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		// 获取容器中的所有 beanDefinitionName
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
-		// 触发所有非懒加载的单例bean的初始化
+		// 循环进行初始化和创建对象
 		for (String beanName : beanNames) {
-			// 将beanDefinition转化为RootBeanDefinition
+			// 获取 RootBeanDefinition，它表示自己的 BeanDefinition 和可能存在父类的 BeanDefinition 合并后的对象
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			// 不是抽象类并且是单例并且非懒加载
+			// 如果是非抽象的，且单实例，非懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				// 是否为工厂bean
+				// 如果是 factoryBean，利用下面这种方法创建对象
 				if (isFactoryBean(beanName)) {
-					// 由于是以&开头获取bean,这里返回的是一个工厂bean，并且不会调用getObject方法
+					// 如果是 factoryBean，则 加上 &，先创建工厂 bean
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						// 判断是否要立即初始化bean
@@ -948,7 +949,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
-					// 不是FactoryBean，直接使用getBean进行初始化
+					// 不是FactoryBean，用这种方法创建对象
 					getBean(beanName);
 				}
 			}
@@ -958,6 +959,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// 触发所有实例bean的后置增强器回调
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
+			// 检查所有的 bean 是否是 SmartInitializingSingleton 接口
 			if (singletonInstance instanceof SmartInitializingSingleton) {
 				StartupStep smartInitialize = this.getApplicationStartup().start("spring.beans.smart-initialize")
 						.tag("beanName", beanName);
@@ -969,6 +971,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}, getAccessControlContext());
 				}
 				else {
+					// 回调 afterSingletonsInstantiated() 方法，可以在回调中做一些事情
 					smartSingleton.afterSingletonsInstantiated();
 				}
 				smartInitialize.end();
